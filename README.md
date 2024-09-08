@@ -4,4 +4,4 @@ https://drive.google.com/drive/folders/137AfEBZ5nFJiv1xriuN2WjFq-a8tYJub?usp=sha
 
 # Running application
 <p>Move the downloaded 2 models folders into ml_models folder in cancerscope_root</p>
-<p>Download docker and Run "docker compose up" from cancerscope_project folder</p>
+<p>Install docker and Run "docker compose up" from FYP folder</p>

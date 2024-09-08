@@ -1,0 +1,334 @@
+{% extends "base.html" %}
+
+{% block title %}
+CancerScope
+{% endblock %}
+
+{% block body %}
+        <div class="container text-center p-2">
+            <div class="row">
+                <div class="col btn-group">
+                    <a href="#" class="btn btn-primary active" aria-current="page">Default</a>
+                </div>
+            </div>
+        </div>
+        <div id="default" class="container text-center p-2">
+            <div class="row">
+                <div class="col">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Image Upload</h5>
+                            <p class="card-text">Upload the mammogram images here.</p>
+                            <form id="uploadForm" method="post" enctype="multipart/form-data">
+                                <label class="btn btn-primary">
+                                    Upload File <input type="file" id="imageUpload" name="imageUpload[]" accept="image/*" multiple hidden>
+                                </label>
+                            </form>                            
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">View all images</h5>
+                            <p class="card-text">View all your uploaded images here.</p>
+                            <button class="btn btn-primary" id="viewImages" data-toggle="modal" data-target="#imageModal">View</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row mt-2">
+                <div class="col">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Make prediction</h5>
+                            <p class="card-text">Select image to make prediction on.</p>
+                            <button class="btn btn-primary" id="selectImage" data-toggle="modal" data-target="#predictionModal">Select Image</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">View all results</h5>
+                            <p class="card-text">View all the predicted results.</p>
+                            <button class="btn btn-primary" id="viewResults" data-toggle="modal" data-target="#resultsModal">Select result</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row mt-2">
+                </div class="col"> 
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col d-flex flex-column align-items-center">
+                                    <h5 class="card-title">Original Image</h5>
+                                    <div class="image-box rounded" 
+                                         id="originalImage" 
+                                         style="width: 256px; 
+                                                height: 256px; 
+                                                border: 2px solid #ddd; 
+                                                background-color: #f8f9fa; 
+                                                display: flex; 
+                                                align-items: center; 
+                                                justify-content: center;">
+                                        <div class="box-text">Choose an image to predict</div>
+                                    </div>
+                                </div>
+                        
+                                <div class="col d-flex flex-column align-items-center">
+                                    <h5 class="card-title">Predicted Image</h5>
+                                    <div class="image-box rounded" 
+                                         id="predictedImage" 
+                                         style="width: 256px; 
+                                                height: 256px; 
+                                                border: 2px solid #ddd; 
+                                                background-color: #f8f9fa; 
+                                                display: flex; 
+                                                align-items: center; 
+                                                justify-content: center;">
+                                        <div class="box-text">Predictions will be shown here</div>
+                                    </div>
+                                </div>
+
+                                <div class="col d-flex flex-column align-items-center">
+                                    <h5 class="card-title mb-5">Classification & Confidence</h5>
+                                    <h5 class="mt-5" id="classificationResult">Classification: </h5>
+                                    <h5 id="probability">Confidence: </h5>
+                                </div>
+                            </div>
+                        </div>                        
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="imageModal" class="modal fade" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Images</h5>
+                    </div>
+                    <div class="modal-body">
+                        <div id="imageContainer"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="predictionModal" class="modal fade" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Images</h5>
+                    </div>
+                    <div class="modal-body">
+                        <input type="text" id="predictionName" class="form-control mb-3" placeholder="Enter prediction name">
+                        <select id="imageSelect" class="form-select mb-3"></select>
+                        <div id="predictImageContainer"></div>
+                        <button id="predictButton" class="btn btn-primary mt-3" disabled>Make prediction</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="resultsModal" class="modal fade" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Results</h5>
+                    </div>
+                    <div class="modal-body">
+                        <select id="allResults" class="form-control mb-3" placeholder="Predictions"></select>
+                        <button id="resultButton" class="btn btn-primary mt-3">View results</button>
+                    </div>
+                </div>
+            </div>
+        </div>                         
+    {% endblock %}
+    {% block scripts %}
+    <script>
+        $(document).ready(function(){
+            $('.btn-group .btn').click(function(){
+                $('.btn-group .btn').removeClass('active');
+                $(this).addClass('active');
+            });
+        });
+        $(document).ready(function() {
+            $('.btn-group .btn').click(function() {
+                // Remove the 'active' class from all buttons
+                $('.btn-group .btn').removeClass('active');
+                
+                // Add the 'active' class to the clicked button
+                $(this).addClass('active');
+                
+                // Check the text of the clicked button
+                if ($(this).text() === 'Default') {
+                    // If it's 'Default', show the 'default' div
+                    $('#custom').hide();
+                    $('#default').show();
+                } else {
+                    // If it's not 'Default', hide the 'default' div
+                    $('#default').hide();
+                    $('#custom').show();
+                }
+            });
+        });        
+    </script>
+    <script>
+        $(document).ready(function() {
+            $('#imageUpload').change(function() {
+                var formData = new FormData($('#uploadForm')[0]);
+                $.ajax({
+                    url: '/upload',
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function(data) {
+                        alert('File uploaded successfully!');
+                    },
+                    error: function(e) {
+                        console.log(e);
+                        alert('There was an error uploading the file.');
+                    }
+                });
+            });
+            $('#imageModal').on('show.bs.modal', function(e) {
+                var imageContainer = $('#imageContainer');
+                imageContainer.empty();  // Remove any existing images
+
+                // Create a row to hold the images
+                var rowElement = $('<div>').addClass('row');
+
+                // Fetch the images from the server
+                $.getJSON('/view-images', function(imageUrls) {
+                    imageUrls.forEach(function(image, index) {
+                        var imgElement = $('<img>', {src: image.data, class: 'img-fluid card-img-top'});
+                        var nameElement = $('<h5>').text(image.name).addClass('card-title');
+                        var cardBodyElement = $('<div>').addClass('card-body').append(nameElement);
+                        var cardElement = $('<div>').addClass('card').append(imgElement, cardBodyElement);
+                        
+                        // Create a column for each image (3 per row)
+                        var colElement = $('<div>').addClass('col-md-4 mb-2').append(cardElement);  // 'col-md-4' makes it 3 columns wide
+                        
+                        rowElement.append(colElement);  // Add the column to the row
+
+                        // After every 3 images, append the row to the container and start a new row
+                        if ((index + 1) % 3 === 0) {
+                            imageContainer.append(rowElement);  // Add the row to the container
+                            rowElement = $('<div>').addClass('row');  // Start a new row
+                        }
+                    });
+
+                    // Append the last row if it has fewer than 3 images
+                    imageContainer.append(rowElement);
+                });
+            });
+            $('#selectImage').click(function(e) {
+                e.preventDefault();  // Prevent the form from being submitted
+            
+                // Fetch the image names from the server
+                $.getJSON('/view-images', function(images) {
+                    var imageSelect = $('#imageSelect');
+                    imageSelect.empty();  // Remove any existing options
+            
+                    // Add a default option
+                    imageSelect.append($('<option>', {value: '', text: 'Select image to predict', selected: true, disabled: true}));
+            
+                    images.forEach(function(image) {
+                        var option = $('<option>', {value: image.name, text: image.name});
+                        imageSelect.append(option);
+                    });
+            
+                    // Show the modal
+                    $('#predictionModal').modal('show');
+                });
+            });
+            
+            $('#imageSelect').change(function() {
+                var selectedImageName = $(this).children('option:selected').val();
+                if (selectedImageName) {  // If an actual image is selected
+                    // Send a POST request to the server
+                    $.post('/view-images', {name: selectedImageName}, function(response) {
+                        // Handle the server's response
+                        var imgElement = $('<img>', {src: response.data, class: 'img-fluid border border-dark mx-auto d-block rounded'});
+                        $('#predictImageContainer').empty().append(imgElement);
+                    });
+                }
+            });
+            
+        
+            $('#predictButton').click(function() {
+                var selectedImage = $('#imageSelect').children('option:selected').val();
+                var resultName = $('#predictionName').val();
+                $('#predictionModal').modal('hide');
+                $('#predictionName').val('');
+                // Send a POST request to the server
+                $.post('/predict-image', {image: selectedImage, prediction_value: resultName}, function(response) {
+                    // Display classification result
+                    $('#classificationResult').text('Classification: ' + response.classification);
+                    $('#probability').text('Confidence: ' + response.probability + '%');
+
+                    // Display segmentation result
+                    $('#originalImage').html(`<img src="${response.original_image}" class="img-fluid">`);
+                    $('#predictedImage').html(`<img src="${response.predicted_image}" class="img-fluid">`);
+                });
+            });
+        
+            $('#viewImages').click(function(e) {
+                e.preventDefault();
+
+                $('#imageModal').modal('show');
+            });
+
+            $('#viewResults').click(function(e) {
+                e.preventDefault();
+
+                // Send GET request to fetch prediction values
+                $.getJSON('/view-results', function(results) {
+                    var allResults = $('#allResults');
+                    allResults.empty();  // Clear existing options
+
+                    // Populate the dropdown with the results
+                    results.forEach(function(result) {
+                        var option = $('<option>', {value: result, text: result});
+                        allResults.append(option);
+                    });
+                }).fail(function(jqXHR, textStatus, errorThrown) {
+                    console.error('Error fetching data:', textStatus, errorThrown);
+                });
+
+                // Show the modal
+                $('#resultsModal').modal('show');
+            });
+
+            $('#resultButton').click(function() {
+                var selectedResult = $('#allResults').children('option:selected').val();
+                if (selectedResult) {
+                    // Send a POST request to the server
+                    $.post('/view-results', {prediction_value: selectedResult}, function(response) {
+                        // Display classification result
+                        $('#classificationResult').text('Classification: ' + response.classification);
+                        $('#probability').text('Confidence: ' + response.probability + '%');
+
+                        // Display segmentation result
+                        $('#originalImage').html(`<img src="${response.original_image}" class="img-fluid">`);
+                        $('#predictedImage').html(`<img src="${response.predicted_image}" class="img-fluid">`);
+                    });
+                }
+            });
+    
+            $('#predictionName, #imageSelect').on('change', function() {
+                var predictionName = $('#predictionName').val();
+                var selectedImage = $('#imageSelect').val();
+                if (predictionName && selectedImage) {
+                    $('#predictButton').prop('disabled', false);
+                } else {
+                    $('#predictButton').prop('disabled', true);
+                }
+            });
+            
+        });
+    </script>
+    {% endblock %}
+</html>

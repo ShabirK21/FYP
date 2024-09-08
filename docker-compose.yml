@@ -1,0 +1,41 @@
+services:
+  web:
+    container_name: cancerscope_project
+    build: ./cancerscope_root
+    command: bash -c "
+      python src/cancerscope_root/main.py"
+    volumes:
+      - ./cancerscope_root/:/usr/src/app/
+    ports:
+      - 8000:8000
+  
+  # tensorflow_serving:
+  #   container_name: cancerscope_tensorflow_serving
+  #   image: tensorflow/serving:2.6.0-gpu
+  #   ports:
+  #     - 8501:8501
+  #   volumes:
+  #     - ./cancerscope_root/ml_models/:/models/
+  #     - ./cancerscope_root/ml_models/models.config:/models/models.config
+  #   command:
+  #     --model_config_file=/models/models.config
+  #   deploy:
+  #     resources:
+  #       reservations:
+  #         devices:
+  #           - capabilities: [gpu]
+
+
+  jupyter:
+    container_name: cancerscope_jupyter
+    image: tensorflow/tensorflow:2.6.0-jupyter
+    command: bash -c "jupyter notebook --ip 0.0.0.0 --no-browser --allow-root --NotebookApp.token=''"
+    ports:
+      - 8888:8888
+    volumes:
+      - .:/tf/notebooks/
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - capabilities: [gpu]

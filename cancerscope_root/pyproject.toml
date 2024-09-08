@@ -1,0 +1,24 @@
+[tool.poetry]
+name = "cancerscope-root"
+version = "0.1.0"
+description = ""
+authors = ["ShabirK21 <shaber213@gmail.com>"]
+readme = "README.md"
+packages = [{include = "cancerscope_root", from = "src"}]
+
+[tool.poetry.dependencies]
+python = "^3.12"
+quart = {extras = ["dotenv"], version = "^0.19.6"}
+hypercorn = "^0.16.0"
+quart-auth = "^0.10.1"
+tortoise-orm = "^0.21.5"
+passlib = "^1.7.4"
+requests = "^2.32.3"
+numpy = "^2.0.1"
+pillow = "^10.4.0"
+opencv-python-headless = "^4.10.0.84"
+aiohttp = "^3.10.5"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
